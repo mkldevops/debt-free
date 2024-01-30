@@ -16,7 +16,12 @@ export default function ProfilePage() {
   return (
     user && (
       <div>
-        <Image src={user?.picture} alt={user?.name} width={30} height={30} />
+        <Image
+          src={user.picture || ""}
+          alt={user.name || ""}
+          width={30}
+          height={30}
+        />
         <h2>{user.name}</h2>
         <p>{user.email}</p>
       </div>
