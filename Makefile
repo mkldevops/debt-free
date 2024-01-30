@@ -15,11 +15,17 @@ dev: install ## Run the development server
 build: install ## Build the application
 	bun run build
 
+prisma: ## Generate prisma client
+	bun run prisma generate
+
+prisma-migrate: ## Migrate prisma
+	bun run prisma migrate dev --name "debt-free"
+
 ## —— Linters ———————————————————————————————————
 lint: ## Run all linters
 	bun lint
 
-analyze: lint build ## Run all linters and tests
+analyze: lint build prisma ## Run all linters and tests
 
 ## —— Git ———————————————————————————————————
 git-clean-branches: ## Clean merged branches
