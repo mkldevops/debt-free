@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { Transaction } from "@prisma/client";
-import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { prisma } from "@/prisma/prisma";
 import { getSession } from "@auth0/nextjs-auth0";
@@ -12,34 +11,23 @@ type Data = {
 const BodySchema = z.object({
   person: z.string().min(1).max(255),
   amount: z.number(),
-  authorId: z.string(),
 });
 
-export const config = {
-  api: {
-    bodyParser: true,
-  },
-};
-
-export default async function POST(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  console.log(req.method);
-
-  if (req.method !== "POST") {
-    res.status(405).end();
-    return;
+export async function POST(request: Request) {
+  if (request.method !== "POST") {
+    return new Response("Method not allowed", { status: 405 });
   }
 
-  const { user } = await getSession();
+  const session = await getSession();
+  const user = session?.user;
 
   if (!user) {
-    res.status(401).end();
-    return;
+    return new Response("Not found data user", { status: 401 });
   }
 
-  const body = BodySchema.parse(req.body);
+  const data = await request.json();
+
+  const body = BodySchema.parse(data);
   const transaction = await prisma.transaction.create({
     data: {
       person: body.person,
@@ -49,5 +37,5 @@ export default async function POST(
     },
   });
 
-  res.status(200).json({ transaction });
+  return Response.json({ transaction });
 }
